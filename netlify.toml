@@ -1,0 +1,21 @@
+# Netlify Configuration for Next.js App
+# PERKESO Prosecution Paper Builder
+
+[build]
+  base = "app"
+  command = "npm run build"
+  publish = ".next"
+
+# Next.js Plugin for Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Environment variables (backup - should also be set in Netlify dashboard)
+[build.environment]
+  NODE_VERSION = "20"
+
+# Redirects for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
