@@ -1,0 +1,319 @@
+/* ============================================
+ * src/app/globals.css
+ * PERKESO Prosecution System
+ * Print Media Query Styles
+ * ============================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+ * BASE STYLES
+ * ============================================ */
+
+:root {
+    --color-primary: #2563eb;
+    --color-secondary: #64748b;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================
+ * UTILITY CLASSES
+ * ============================================ */
+
+/* Hide elements during print */
+.no-print {
+    display: block;
+}
+
+/* Document paper base */
+.document-paper {
+    background: white;
+    max-width: 210mm;
+    /* A4 width */
+    margin: 0 auto;
+    padding: 20mm;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+}
+
+/* Print-only elements */
+.print-only {
+    display: none;
+}
+
+/* ============================================
+ * PRINT MEDIA QUERY
+ * Semua aturan gaya untuk percetakan
+ * ============================================ */
+
+@media print {
+    /* -----------------------------------------
+   * 1. HIDE UI ELEMENTS
+   * Sembunyikan Sidebar, Navbar, Butang
+   * ----------------------------------------- */
+
+    .no-print,
+    .sidebar,
+    .navbar,
+    .header,
+    nav,
+    button,
+    .btn,
+    [role="navigation"],
+    [data-no-print],
+    .print\\:hidden {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Show print-only elements */
+    .print-only {
+        display: block !important;
+    }
+
+    /* -----------------------------------------
+   * 2. PAGE SETUP - A4
+   * Kertas A4: 210mm x 297mm
+   * ----------------------------------------- */
+
+    @page {
+        size: A4 portrait;
+        margin: 15mm 20mm;
+    }
+
+    /* First page can have different margin */
+    @page :first {
+        margin-top: 20mm;
+    }
+
+    /* -----------------------------------------
+   * 3. DOCUMENT PAPER
+   * 100% lebar kertas, latar putih
+   * ----------------------------------------- */
+
+    .document-paper {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* -----------------------------------------
+   * 4. TYPOGRAPHY
+   * Font Times New Roman, 12pt
+   * ----------------------------------------- */
+
+    body,
+    .document-paper,
+    .print-body {
+        font-family: "Times New Roman", Times, serif !important;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+        color: #000 !important;
+        background: white !important;
+    }
+
+    h1 {
+        font-size: 16pt !important;
+    }
+
+    h2 {
+        font-size: 14pt !important;
+    }
+
+    h3 {
+        font-size: 13pt !important;
+    }
+
+    p {
+        font-size: 12pt !important;
+        text-align: justify !important;
+    }
+
+    /* -----------------------------------------
+   * 5. RESET TAILWIND COLORS FOR PRINT
+   * ----------------------------------------- */
+
+    * {
+        color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Background colors for important boxes */
+    .bg-blue-50,
+    .bg-indigo-50,
+    .bg-green-50,
+    .bg-red-50,
+    .bg-yellow-50 {
+        background-color: #f8f8f8 !important;
+    }
+
+    /* Remove shadows */
+    .shadow,
+    .shadow-sm,
+    .shadow-md,
+    .shadow-lg,
+    .shadow-xl {
+        box-shadow: none !important;
+    }
+
+    /* -----------------------------------------
+   * 6. PAGE BREAKS
+   * ----------------------------------------- */
+
+    .page-break-before {
+        page-break-before: always !important;
+    }
+
+    .page-break-after {
+        page-break-after: always !important;
+    }
+
+    .avoid-page-break {
+        page-break-inside: avoid !important;
+    }
+
+    /* Avoid breaking inside tables, images */
+    table,
+    figure,
+    img,
+    .keep-together {
+        page-break-inside: avoid !important;
+    }
+
+    /* -----------------------------------------
+   * 7. LINKS - Show URL
+   * ----------------------------------------- */
+
+    a[href]:after {
+        content: none !important;
+        /* Don't show URL */
+    }
+
+    /* -----------------------------------------
+   * 8. TABLE STYLES
+   * ----------------------------------------- */
+
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th,
+    td {
+        border: 1px solid #000 !important;
+        padding: 4pt 8pt !important;
+        font-size: 11pt !important;
+    }
+
+    th {
+        background: #f0f0f0 !important;
+        font-weight: bold !important;
+    }
+
+    /* -----------------------------------------
+   * 9. SPECIFIC ELEMENTS
+   * ----------------------------------------- */
+
+    /* Hide contentEditable warning */
+    [contenteditable]:focus {
+        outline: none !important;
+    }
+
+    /* Legal document spacing */
+    .legal-text {
+        text-align: justify !important;
+        text-indent: 2em !important;
+        margin-bottom: 12pt !important;
+    }
+
+    /* Signature lines */
+    .signature-line {
+        border-bottom: 1px solid #000 !important;
+        width: 50mm !important;
+        margin-top: 30pt !important;
+    }
+}
+
+/* ============================================
+ * TAILWIND CUSTOM UTILITIES
+ * ============================================ */
+
+@layer utilities {
+
+    /* Print utilities */
+    .print\:block {
+        @media print {
+            display: block !important;
+        }
+    }
+
+    .print\:hidden {
+        @media print {
+            display: none !important;
+        }
+    }
+
+    .print\:w-full {
+        @media print {
+            width: 100% !important;
+        }
+    }
+
+    .print\:p-0 {
+        @media print {
+            padding: 0 !important;
+        }
+    }
+
+    .print\:m-0 {
+        @media print {
+            margin: 0 !important;
+        }
+    }
+
+    .print\:shadow-none {
+        @media print {
+            box-shadow: none !important;
+        }
+    }
+
+    .print\:bg-white {
+        @media print {
+            background-color: white !important;
+        }
+    }
+
+    .print\:text-black {
+        @media print {
+            color: #000 !important;
+        }
+    }
+
+    .print\:font-serif {
+        @media print {
+            font-family: "Times New Roman", Times, serif !important;
+        }
+    }
+
+    .print\:text-12pt {
+        @media print {
+            font-size: 12pt !important;
+        }
+    }
+}
