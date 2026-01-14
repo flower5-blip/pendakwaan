@@ -13,21 +13,54 @@ export function useAuth() {
 
     useEffect(() => {
         const getUser = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-            setUser(user);
+            try {
+                const {
+                    data: { user },
+                } = await supabase.auth.getUser();
+                setUser(user);
 
-            if (user) {
-                const { data: profile } = await supabase
-                    .from("profiles")
-                    .select("*")
-                    .eq("id", user.id)
-                    .single();
-                setProfile(profile);
+                if (user) {
+                    const { data: existingProfile, error } = await supabase
+                        .from("profiles")
+                        .select("*")
+                        .eq("id", user.id)
+                        .single();
+
+                    if (existingProfile) {
+                        setProfile(existingProfile);
+                    } else if (error?.code === 'PGRST116') {
+                        // Profile doesn't exist - create one automatically
+                        const { data: newProfile } = await supabase
+                            .from("profiles")
+                            .insert({
+                                id: user.id,
+                                full_name: user.email?.split('@')[0] || 'Pengguna',
+                                role: 'io', // Default role for testing
+                            })
+                            .select()
+                            .single();
+
+                        if (newProfile) {
+                            setProfile(newProfile);
+                        } else {
+                            // Still set a default profile so UI doesn't hang
+                            setProfile({
+                                id: user.id,
+                                full_name: user.email?.split('@')[0] || 'Pengguna',
+                                role: 'io',
+                                department: null,
+                                phone: null,
+                                created_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString(),
+                            } as Profile);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Auth error:', err);
+            } finally {
+                setLoading(false);
             }
-
-            setLoading(false);
         };
 
         getUser();
@@ -42,7 +75,21 @@ export function useAuth() {
                     .select("*")
                     .eq("id", session.user.id)
                     .single();
-                setProfile(profile);
+
+                if (profile) {
+                    setProfile(profile);
+                } else {
+                    // Create default profile for UI
+                    setProfile({
+                        id: session.user.id,
+                        full_name: session.user.email?.split('@')[0] || 'Pengguna',
+                        role: 'io',
+                        department: null,
+                        phone: null,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                    } as Profile);
+                }
             } else {
                 setProfile(null);
             }
