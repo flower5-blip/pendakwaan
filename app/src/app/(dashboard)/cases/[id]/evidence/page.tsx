@@ -5,8 +5,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect, use } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -31,9 +31,12 @@ interface Evidence {
     created_at: string;
 }
 
-export default function EvidencePage() {
-    const params = useParams();
-    const caseId = params.id as string;
+interface EvidencePageProps {
+    params: Promise<{ id: string }>;
+}
+
+export default function EvidencePage({ params }: EvidencePageProps) {
+    const { id: caseId } = use(params);
     const router = useRouter();
     const { profile, canEdit } = useAuth();
     const supabase = createClient();
