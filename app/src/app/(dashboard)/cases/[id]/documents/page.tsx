@@ -67,7 +67,7 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
             // Fetch evidence if table exists
             try {
                 const { data: evidenceData } = await supabase
-                    .from('evidence')
+                    .from('evidences')
                     .select('*')
                     .eq('case_id', id);
 
