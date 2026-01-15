@@ -92,12 +92,15 @@ export default function CasesPage() {
                                 className="h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="all">Semua Status</option>
-                                <option value="draft">Draf</option>
-                                <option value="in_progress">Dalam Proses</option>
-                                <option value="pending_review">Menunggu Semakan</option>
-                                <option value="approved">Diluluskan</option>
-                                <option value="filed">Difailkan</option>
-                                <option value="closed">Ditutup</option>
+                                <option value="draf">Draf</option>
+                                <option value="dalam_siasatan">Dalam Siasatan</option>
+                                <option value="menunggu_semakan">Menunggu Semakan</option>
+                                <option value="menunggu_sanksi">Menunggu Sanksi</option>
+                                <option value="sanksi_diluluskan">Sanksi Diluluskan</option>
+                                <option value="dikompaun">Dikompaun</option>
+                                <option value="didakwa">Didakwa</option>
+                                <option value="selesai">Selesai</option>
+                                <option value="nfa">NFA</option>
                             </select>
                         </div>
                     </div>
@@ -152,16 +155,16 @@ export default function CasesPage() {
                                                 </Link>
                                                 <Badge
                                                     variant={
-                                                        caseItem.status === "approved"
+                                                        caseItem.status === "sanksi_diluluskan" || caseItem.status === "selesai"
                                                             ? "success"
-                                                            : caseItem.status === "pending_review"
+                                                            : caseItem.status === "menunggu_semakan" || caseItem.status === "menunggu_sanksi"
                                                                 ? "warning"
-                                                                : caseItem.status === "draft"
+                                                                : caseItem.status === "draf"
                                                                     ? "secondary"
                                                                     : "default"
                                                     }
                                                 >
-                                                    {CASE_STATUS_LABELS[caseItem.status]}
+                                                    {CASE_STATUS_LABELS[caseItem.status] || caseItem.status}
                                                 </Badge>
                                             </div>
                                             <p className="text-sm text-gray-600">

@@ -11,6 +11,8 @@ import { CASE_STATUS_LABELS, ACT_TYPE_LABELS, USER_ROLE_LABELS } from "@/lib/con
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import type { Case, Person } from "@/types";
+import StatusChange from "@/components/workflow/StatusChange";
+import Timeline from "@/components/workflow/Timeline";
 import {
     ArrowLeft,
     Pencil,
@@ -24,6 +26,10 @@ import {
     Plus,
     Clock,
     AlertCircle,
+    Package,
+    Scale,
+    DollarSign,
+    Gavel,
 } from "lucide-react";
 
 interface CaseDetailPageProps {
@@ -126,14 +132,14 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                             </h1>
                             <Badge
                                 variant={
-                                    caseData.status === "approved"
+                                    caseData.status === "sanksi_diluluskan" || caseData.status === "selesai"
                                         ? "success"
-                                        : caseData.status === "pending_review"
+                                        : caseData.status === "menunggu_semakan" || caseData.status === "menunggu_sanksi"
                                             ? "warning"
                                             : "secondary"
                                 }
                             >
-                                {CASE_STATUS_LABELS[caseData.status]}
+                                {CASE_STATUS_LABELS[caseData.status] || caseData.status}
                             </Badge>
                         </div>
                         <p className="text-gray-600">{ACT_TYPE_LABELS[caseData.act_type]}</p>
@@ -252,6 +258,67 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                         </CardContent>
                     </Card>
 
+                    {/* Quick Actions */}
+                    {canEdit() && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Tindakan Pantas</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <Link href={`/cases/${id}/evidence`}>
+                                    <Button variant="outline" size="sm" className="w-full justify-start">
+                                        <Package className="h-4 w-4 mr-2" />
+                                        Bukti
+                                    </Button>
+                                </Link>
+                                <Link href={`/cases/${id}/statements`}>
+                                    <Button variant="outline" size="sm" className="w-full justify-start">
+                                        <FileText className="h-4 w-4 mr-2" />
+                                        Pernyataan
+                                    </Button>
+                                </Link>
+                                <Link href={`/cases/${id}/documents`}>
+                                    <Button variant="outline" size="sm" className="w-full justify-start">
+                                        <FileText className="h-4 w-4 mr-2" />
+                                        Dokumen
+                                    </Button>
+                                </Link>
+                                {caseData.status === 'menunggu_semakan' && (
+                                    <Link href={`/cases/${id}/review`}>
+                                        <Button variant="outline" size="sm" className="w-full justify-start">
+                                            <FileText className="h-4 w-4 mr-2" />
+                                            Semakan
+                                        </Button>
+                                    </Link>
+                                )}
+                                {caseData.status === 'menunggu_sanksi' && (
+                                    <Link href={`/cases/${id}/sanction`}>
+                                        <Button variant="outline" size="sm" className="w-full justify-start">
+                                            <Scale className="h-4 w-4 mr-2" />
+                                            Sanksi
+                                        </Button>
+                                    </Link>
+                                )}
+                                {(caseData.status === 'sanksi_diluluskan' || caseData.status === 'dikompaun') && (
+                                    <Link href={`/cases/${id}/compound`}>
+                                        <Button variant="outline" size="sm" className="w-full justify-start">
+                                            <DollarSign className="h-4 w-4 mr-2" />
+                                            Kompaun
+                                        </Button>
+                                    </Link>
+                                )}
+                                {(caseData.status === 'sanksi_diluluskan' || caseData.status === 'dikompaun' || caseData.status === 'didakwa') && (
+                                    <Link href={`/cases/${id}/charges`}>
+                                        <Button variant="outline" size="sm" className="w-full justify-start">
+                                            <Gavel className="h-4 w-4 mr-2" />
+                                            Pendakwaan
+                                        </Button>
+                                    </Link>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
                     {/* Persons */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
@@ -300,7 +367,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
-                    {/* Status Card */}
+                    {/* Status Card with Workflow */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Status Kes</CardTitle>
@@ -322,13 +389,18 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                     {ACT_TYPE_LABELS[caseData.act_type]}
                                 </span>
                             </div>
-                            {canEdit() && (
-                                <Button className="w-full" variant="outline">
-                                    Kemaskini Status
-                                </Button>
-                            )}
                         </CardContent>
                     </Card>
+
+                    {/* Workflow Status Change Component */}
+                    <StatusChange
+                        caseId={id}
+                        currentStatus={caseData.status as any}
+                        onStatusChange={(newStatus) => {
+                            // Refresh page to show new status
+                            window.location.reload();
+                        }}
+                    />
 
                     {/* IO Information */}
                     <Card>
@@ -354,41 +426,16 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                         </CardContent>
                     </Card>
 
-                    {/* Timeline */}
+                    {/* Workflow Timeline */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Clock className="h-5 w-5" />
-                                Garis Masa
+                                Garis Masa Status
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 mt-0.5">
-                                        <div className="h-2 w-2 rounded-full bg-green-600"></div>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium">Kes Dibuat</p>
-                                        <p className="text-xs text-gray-500">
-                                            {formatDate(caseData.created_at)}
-                                        </p>
-                                    </div>
-                                </div>
-                                {caseData.updated_at !== caseData.created_at && (
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 mt-0.5">
-                                            <div className="h-2 w-2 rounded-full bg-blue-600"></div>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium">Kemaskini Terakhir</p>
-                                            <p className="text-xs text-gray-500">
-                                                {formatDate(caseData.updated_at)}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <Timeline caseId={id} />
                         </CardContent>
                     </Card>
                 </div>

@@ -29,13 +29,14 @@ export function useAuth() {
                     if (existingProfile) {
                         setProfile(existingProfile);
                     } else if (error?.code === 'PGRST116') {
-                        // Profile doesn't exist - create one automatically
+                        // Profile doesn't exist - create one with 'viewer' role (most restrictive)
+                        // Admin must manually assign proper role via admin interface
                         const { data: newProfile } = await supabase
                             .from("profiles")
                             .insert({
                                 id: user.id,
                                 full_name: user.email?.split('@')[0] || 'Pengguna',
-                                role: 'io', // Default role for testing
+                                role: 'viewer', // SECURITY FIX: Default to viewer, not 'io'
                             })
                             .select()
                             .single();
@@ -47,7 +48,7 @@ export function useAuth() {
                             setProfile({
                                 id: user.id,
                                 full_name: user.email?.split('@')[0] || 'Pengguna',
-                                role: 'io',
+                                role: 'viewer', // SECURITY FIX: Default to viewer
                                 department: null,
                                 phone: null,
                                 created_at: new Date().toISOString(),
@@ -79,11 +80,11 @@ export function useAuth() {
                 if (profile) {
                     setProfile(profile);
                 } else {
-                    // Create default profile for UI
+                    // Create default profile for UI with viewer role (most restrictive)
                     setProfile({
                         id: session.user.id,
                         full_name: session.user.email?.split('@')[0] || 'Pengguna',
-                        role: 'io',
+                        role: 'viewer', // SECURITY FIX: Default to viewer, not 'io'
                         department: null,
                         phone: null,
                         created_at: new Date().toISOString(),

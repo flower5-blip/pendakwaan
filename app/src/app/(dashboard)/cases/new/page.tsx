@@ -91,7 +91,18 @@ export default function NewCasePage() {
                 employerId = newEmployer.id;
             }
 
-            // Create case
+            // Validate required prosecution fields
+            if (!formData.offense_type || !formData.section_charged || !formData.section_penalty || !formData.date_of_offense) {
+                alert("Sila lengkapkan semua maklumat kesalahan yang diperlukan (Jenis Kesalahan, Seksyen, dan Tarikh Kesalahan).");
+                setLoading(false);
+                return;
+            }
+
+            // Get auto-fill data for compound section (if not already set)
+            const autoFill = getAutoFill(formData.act_type, formData.offense_type);
+            const sectionCompound = autoFill?.compound_section || null;
+
+            // Create case with all prosecution fields
             const { data: newCase, error: caseError } = await supabase
                 .from("cases")
                 .insert({
@@ -100,6 +111,13 @@ export default function NewCasePage() {
                     io_id: profile?.id,
                     status: "draft",
                     act_type: formData.act_type,
+                    // Prosecution fields - CRITICAL FIX: Save all collected data
+                    offense_type: formData.offense_type,
+                    date_of_offense: formData.date_of_offense,
+                    section_charged: formData.section_charged,
+                    section_penalty: formData.section_penalty,
+                    section_compound: sectionCompound,
+                    // Investigation fields
                     inspection_date: formData.inspection_date || null,
                     inspection_location: formData.inspection_location || null,
                     issue_summary: formData.issue_summary || null,

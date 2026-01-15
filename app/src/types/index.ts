@@ -1,5 +1,15 @@
 export type UserRole = "admin" | "io" | "po" | "uip" | "viewer";
-export type CaseStatus = "draft" | "in_progress" | "pending_review" | "approved" | "filed" | "closed";
+// Updated to match workflow from 4-database-schema.md
+export type CaseStatus = 
+    | "draf" 
+    | "dalam_siasatan" 
+    | "menunggu_semakan" 
+    | "menunggu_sanksi" 
+    | "sanksi_diluluskan" 
+    | "dikompaun" 
+    | "didakwa" 
+    | "selesai" 
+    | "nfa";
 export type EvidenceStatus = "draft" | "ready" | "need_fix";
 export type ActType = "akta4" | "akta800" | "both";
 export type PersonRole = "saksi" | "oks" | "pekerja";

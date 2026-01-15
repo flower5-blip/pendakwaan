@@ -17,31 +17,41 @@ export const USER_ROLE_LABELS: Record<string, string> = {
     viewer: "Pemerhati",
 };
 
+// Updated to match workflow from 4-database-schema.md
 export const CASE_STATUS = {
-    DRAFT: "draft",
-    IN_PROGRESS: "in_progress",
-    PENDING_REVIEW: "pending_review",
-    APPROVED: "approved",
-    FILED: "filed",
-    CLOSED: "closed",
+    DRAF: "draf",
+    DALAM_SIASATAN: "dalam_siasatan",
+    MENUNGGU_SEMAKAN: "menunggu_semakan",
+    MENUNGGU_SANKSI: "menunggu_sanksi",
+    SANKSI_DILULUSKAN: "sanksi_diluluskan",
+    DIKOMPAUN: "dikompaun",
+    DIDAKWA: "didakwa",
+    SELESAI: "selesai",
+    NFA: "nfa",
 } as const;
 
 export const CASE_STATUS_LABELS: Record<string, string> = {
-    draft: "Draf",
-    in_progress: "Dalam Proses",
-    pending_review: "Menunggu Semakan",
-    approved: "Diluluskan",
-    filed: "Difailkan",
-    closed: "Ditutup",
+    draf: "Draf",
+    dalam_siasatan: "Dalam Siasatan",
+    menunggu_semakan: "Menunggu Semakan",
+    menunggu_sanksi: "Menunggu Sanksi",
+    sanksi_diluluskan: "Sanksi Diluluskan",
+    dikompaun: "Dikompaun",
+    didakwa: "Didakwa",
+    selesai: "Selesai",
+    nfa: "NFA (Tiada Tindakan Lanjut)",
 };
 
 export const CASE_STATUS_COLORS: Record<string, string> = {
-    draft: "bg-gray-100 text-gray-800",
-    in_progress: "bg-blue-100 text-blue-800",
-    pending_review: "bg-yellow-100 text-yellow-800",
-    approved: "bg-green-100 text-green-800",
-    filed: "bg-purple-100 text-purple-800",
-    closed: "bg-red-100 text-red-800",
+    draf: "bg-gray-100 text-gray-800",
+    dalam_siasatan: "bg-blue-100 text-blue-800",
+    menunggu_semakan: "bg-yellow-100 text-yellow-800",
+    menunggu_sanksi: "bg-orange-100 text-orange-800",
+    sanksi_diluluskan: "bg-green-100 text-green-800",
+    dikompaun: "bg-purple-100 text-purple-800",
+    didakwa: "bg-red-100 text-red-800",
+    selesai: "bg-emerald-100 text-emerald-800",
+    nfa: "bg-slate-100 text-slate-800",
 };
 
 export const ACT_TYPES = {

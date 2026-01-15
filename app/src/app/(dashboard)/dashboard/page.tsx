@@ -23,10 +23,11 @@ export default function DashboardPage() {
 
     const stats = {
         total: cases.length,
-        draft: cases.filter((c) => c.status === "draft").length,
-        inProgress: cases.filter((c) => c.status === "in_progress").length,
-        pendingReview: cases.filter((c) => c.status === "pending_review").length,
-        approved: cases.filter((c) => c.status === "approved").length,
+        draft: cases.filter((c) => c.status === "draf").length,
+        dalamSiasatan: cases.filter((c) => c.status === "dalam_siasatan").length,
+        pendingReview: cases.filter((c) => c.status === "menunggu_semakan").length,
+        pendingSanction: cases.filter((c) => c.status === "menunggu_sanksi").length,
+        selesai: cases.filter((c) => c.status === "selesai").length,
     };
 
     const recentCases = cases.slice(0, 5);
@@ -94,6 +95,20 @@ export default function DashboardPage() {
                 <Card>
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+                                <Clock className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-600">Dalam Siasatan</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.dalamSiasatan}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="flex items-center gap-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-yellow-100">
                                 <Clock className="h-6 w-6 text-yellow-600" />
                             </div>
@@ -112,8 +127,8 @@ export default function DashboardPage() {
                                 <CheckCircle className="h-6 w-6 text-green-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Diluluskan</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.approved}</p>
+                                <p className="text-sm text-gray-600">Selesai</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.selesai}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -168,14 +183,14 @@ export default function DashboardPage() {
                                     </div>
                                     <Badge
                                         variant={
-                                            caseItem.status === "approved"
+                                            caseItem.status === "sanksi_diluluskan" || caseItem.status === "selesai"
                                                 ? "success"
-                                                : caseItem.status === "pending_review"
+                                                : caseItem.status === "menunggu_semakan" || caseItem.status === "menunggu_sanksi"
                                                     ? "warning"
                                                     : "secondary"
                                         }
                                     >
-                                        {CASE_STATUS_LABELS[caseItem.status]}
+                                        {CASE_STATUS_LABELS[caseItem.status] || caseItem.status}
                                     </Badge>
                                 </Link>
                             ))}
