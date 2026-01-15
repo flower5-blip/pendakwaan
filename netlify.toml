@@ -11,15 +11,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Cache Plugin - Auto manage cache dengan bijak
-[[plugins]]
-  package = "netlify-plugin-cache"
-  [plugins.inputs]
-    paths = [
-      "node_modules/.cache",
-      ".next/cache"
-    ]
-
 # Environment variables
 [build.environment]
   NODE_VERSION = "20"
