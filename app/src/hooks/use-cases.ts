@@ -14,21 +14,29 @@ export function useCases() {
         setLoading(true);
         setError(null);
 
-        const { data, error } = await supabase
-            .from("cases")
-            .select(`
-        *,
-        employer:employers(*),
-        io:profiles!cases_io_id_fkey(*)
-      `)
-            .order("created_at", { ascending: false });
+        try {
+            const { data, error: fetchError } = await supabase
+                .from("cases")
+                .select(`
+                    *,
+                    employer:employers(*)
+                `)
+                .order("created_at", { ascending: false });
 
-        if (error) {
-            setError(error.message);
-        } else {
-            setCases(data || []);
+            if (fetchError) {
+                console.error("Error fetching cases:", fetchError);
+                setError(fetchError.message);
+                setCases([]);
+            } else {
+                setCases(data || []);
+            }
+        } catch (err) {
+            console.error("Unexpected error fetching cases:", err);
+            setError("Ralat tidak dijangka");
+            setCases([]);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }, [supabase]);
 
     useEffect(() => {
