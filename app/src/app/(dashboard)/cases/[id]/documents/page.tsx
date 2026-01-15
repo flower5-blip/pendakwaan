@@ -55,7 +55,7 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                 .eq('role', 'pekerja');
 
             // Map to employee format
-            setEmployees((personsData || []).map(p => ({
+            setEmployees((personsData || []).map((p: any) => ({
                 id: p.id,
                 full_name: p.name,
                 ic_number: p.ic_number,
@@ -71,7 +71,7 @@ export default function DocumentsPage({ params }: DocumentsPageProps) {
                     .select('*')
                     .eq('case_id', id);
 
-                setEvidences((evidenceData || []).map((e, i) => ({
+                setEvidences((evidenceData || []).map((e: any, i: number) => ({
                     id: e.id,
                     exhibit_number: e.exhibit_number || `E${i + 1}`,
                     name: e.name,
