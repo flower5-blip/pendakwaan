@@ -109,7 +109,7 @@ export default function NewCasePage() {
                     case_number: formData.case_number,
                     employer_id: employerId || null,
                     io_id: profile?.id,
-                    status: "draft",
+                    status: "draf",
                     act_type: formData.act_type,
                     // Prosecution fields - CRITICAL FIX: Save all collected data
                     offense_type: formData.offense_type,
@@ -130,9 +130,24 @@ export default function NewCasePage() {
             if (caseError) throw caseError;
 
             router.push(`/cases/${newCase.id}`);
-        } catch (error) {
+        } catch (error: unknown) {
+            // Enhanced error logging
             console.error("Error creating case:", error);
-            alert("Ralat semasa membuat kes. Sila cuba lagi.");
+
+            // Extract error message properly
+            let errorMessage = "Ralat tidak diketahui";
+            if (error && typeof error === 'object') {
+                const err = error as { message?: string; details?: string; hint?: string; code?: string };
+                errorMessage = err.message || err.details || err.hint || JSON.stringify(error);
+                console.error("Error details:", {
+                    message: err.message,
+                    details: err.details,
+                    hint: err.hint,
+                    code: err.code
+                });
+            }
+
+            alert(`Ralat semasa membuat kes: ${errorMessage}`);
         } finally {
             setLoading(false);
         }
