@@ -3,19 +3,39 @@
 
 [build]
   base = "app"
-  command = "npm run build"
+  # Clear cache sebelum build untuk elak masalah cache corrupt
+  command = "rm -rf .next/cache && npm run build"
   publish = ".next"
 
 # Next.js Plugin for Netlify
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Environment variables (backup - should also be set in Netlify dashboard)
+# Cache Plugin - Auto manage cache dengan bijak
+[[plugins]]
+  package = "netlify-plugin-cache"
+  [plugins.inputs]
+    paths = [
+      "node_modules/.cache",
+      ".next/cache"
+    ]
+
+# Environment variables
 [build.environment]
   NODE_VERSION = "20"
+  # Optimize Next.js build
+  NEXT_TELEMETRY_DISABLED = "1"
 
-# Redirects for SPA routing
+# Headers untuk performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# Redirects for SPA routing (Next.js handle sendiri)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false

@@ -49,7 +49,7 @@ export function useCases() {
 
     useEffect(() => {
         fetchCases();
-    }, [fetchCases]);
+    }, []);
 
     const createCase = async (caseData: Partial<Case>) => {
         const { data, error } = await supabase
