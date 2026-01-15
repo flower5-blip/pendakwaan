@@ -212,13 +212,16 @@ export default function AuditPage() {
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         <div className="lg:col-span-2">
-                            <Input
-                                label="Carian"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Cari dalam jadual, ID rekod, pengguna..."
-                                icon={<Search className="h-4 w-4" />}
-                            />
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Input
+                                    label="Carian"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Cari dalam jadual, ID rekod, pengguna..."
+                                    className="pl-10"
+                                />
+                            </div>
                         </div>
                         <Select
                             label="Jadual"
