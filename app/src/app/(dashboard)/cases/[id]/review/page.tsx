@@ -13,7 +13,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { CASE_STATUS_LABELS, CASE_STATUS_COLORS } from '@/lib/workflow';
+import { CASE_STATUS_LABELS, CASE_STATUS_COLORS, type CaseStatus } from '@/lib/workflow';
 import { updateCaseStatus } from '@/app/actions/workflow-actions';
 import { ArrowLeft, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -109,7 +109,7 @@ export default function ReviewPage() {
         );
     }
 
-    const currentStatus = caseData.status;
+    const currentStatus = caseData.status as CaseStatus;
 
     if (currentStatus !== 'menunggu_semakan') {
         return (

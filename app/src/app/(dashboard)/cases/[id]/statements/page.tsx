@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, FileText, CheckCircle, XCircle, User } from 'lucide-react';
+import { ArrowLeft, Plus, FileText, CheckCircle, XCircle, User, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Statement {

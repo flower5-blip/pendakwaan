@@ -49,8 +49,8 @@ export function useAuth() {
                                 id: user.id,
                                 full_name: user.email?.split('@')[0] || 'Pengguna',
                                 role: 'viewer', // SECURITY FIX: Default to viewer
-                                department: null,
-                                phone: null,
+                                department: undefined,
+                                phone: undefined,
                                 created_at: new Date().toISOString(),
                                 updated_at: new Date().toISOString(),
                             } as Profile);
@@ -85,8 +85,8 @@ export function useAuth() {
                         id: session.user.id,
                         full_name: session.user.email?.split('@')[0] || 'Pengguna',
                         role: 'viewer', // SECURITY FIX: Default to viewer, not 'io'
-                        department: null,
-                        phone: null,
+                        department: undefined,
+                        phone: undefined,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                     } as Profile);
