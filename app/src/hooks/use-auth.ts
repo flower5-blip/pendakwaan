@@ -13,6 +13,12 @@ export function useAuth() {
     const supabase = useMemo(() => createClient(), []);
 
     useEffect(() => {
+        // Safety timeout to prevent infinite loading if Auth hangs
+        const safetyTimeout = setTimeout(() => {
+            console.warn("Auth check timed out - forcing loading false");
+            setLoading(false);
+        }, 5000);
+
         const getUser = async () => {
             try {
                 const {
@@ -61,6 +67,7 @@ export function useAuth() {
             } catch (err) {
                 console.error('Auth error:', err);
             } finally {
+                clearTimeout(safetyTimeout);
                 setLoading(false);
             }
         };

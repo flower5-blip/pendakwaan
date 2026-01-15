@@ -15,6 +15,12 @@ export function useCases() {
         setLoading(true);
         setError(null);
 
+        // Safety timeout to prevent infinite loading
+        const safetyTimeout = setTimeout(() => {
+            console.warn("Fetch cases timed out - forcing loading false");
+            setLoading(false);
+        }, 5000);
+
         try {
             const { data, error: fetchError } = await supabase
                 .from("cases")
@@ -36,6 +42,7 @@ export function useCases() {
             setError("Ralat tidak dijangka");
             setCases([]);
         } finally {
+            clearTimeout(safetyTimeout);
             setLoading(false);
         }
     }, [supabase]);
