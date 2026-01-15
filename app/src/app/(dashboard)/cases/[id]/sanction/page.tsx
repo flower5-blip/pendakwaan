@@ -67,15 +67,15 @@ export default function SanctionPage() {
         setSubmitting(true);
 
         // Tentukan laluan berdasarkan pilihan
-        let route: 'dikompaun' | 'didakwa' | 'nfa' = 'dikompaun';
-        if (sanctionType === 'prosecution') route = 'didakwa';
+        let route: 'compound_offered' | 'prosecution' | 'nfa' = 'compound_offered';
+        if (sanctionType === 'prosecution') route = 'prosecution';
         if (sanctionType === 'nfa') route = 'nfa';
 
         // Gunakan Server Action yang menggabungkan kedua-dua operasi
         const result = await approveSanctionWithRoute(caseId, route, sanctionNotes);
 
         if (result.success) {
-            const routeLabel = route === 'dikompaun' ? 'Kompaun' : route === 'didakwa' ? 'Pendakwaan' : 'NFA';
+            const routeLabel = route === 'compound_offered' ? 'Kompaun' : route === 'prosecution' ? 'Pendakwaan' : 'NFA';
             alert(`Sanksi diluluskan. Kes telah diarahkan ke ${routeLabel}.`);
             router.push(`/cases/${caseId}`);
         } else {
@@ -88,7 +88,7 @@ export default function SanctionPage() {
         if (!caseData) return;
 
         setSubmitting(true);
-        const result = await updateCaseStatus(caseId, 'menunggu_semakan', sanctionNotes);
+        const result = await updateCaseStatus(caseId, 'pending_review', sanctionNotes);
 
         if (result.success) {
             alert('Sanksi ditolak. Kes dikembalikan kepada PO untuk semakan semula.');
@@ -120,7 +120,7 @@ export default function SanctionPage() {
 
     const currentStatus = caseData.status as CaseStatus;
 
-    if (currentStatus !== 'menunggu_sanksi') {
+    if (currentStatus !== 'approved') {
         return (
             <div className="text-center py-12">
                 <p className="text-gray-600">
@@ -167,7 +167,7 @@ export default function SanctionPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Majikan</p>
-                            <p className="font-medium">{caseData.employer?.name || '-'}</p>
+                            <p className="font-medium">{caseData.employer?.company_name || '-'}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Pegawai Penyiasat</p>

@@ -132,11 +132,11 @@ export default function CompoundPage() {
 
             if (error) throw error;
 
-            // Update case status to dikompaun
+            // Update case status to compound_offered
             await supabase
                 .from('cases')
                 .update({
-                    status: 'dikompaun',
+                    status: 'compound_offered',
                     compound_amount: formData.amount,
                     compound_offer_date: formData.offer_date,
                 })
@@ -179,11 +179,11 @@ export default function CompoundPage() {
         if (error) {
             alert('Ralat semasa mengemaskini bayaran.');
         } else {
-            // Update case status to selesai
+            // Update case status to completed
             await supabase
                 .from('cases')
                 .update({
-                    status: 'selesai',
+                    status: 'completed',
                     compound_payment_date: new Date().toISOString().split('T')[0],
                     compound_status: 'paid',
                 })
@@ -242,7 +242,7 @@ export default function CompoundPage() {
                         <p className="text-gray-600">{caseData.case_number}</p>
                     </div>
                 </div>
-                {canEdit() && caseData.status === 'sanksi_diluluskan' && (
+                {canEdit() && caseData.status === 'approved' && (
                     <Button onClick={() => setShowAddForm(!showAddForm)}>
                         <Plus className="h-4 w-4 mr-2" />
                         Tawarkan Kompaun
@@ -407,7 +407,7 @@ export default function CompoundPage() {
                         <div className="text-center">
                             <DollarSign className="h-12 w-12 mx-auto text-gray-400 mb-4" />
                             <p className="text-gray-600">Tiada tawaran kompaun dijumpai</p>
-                            {canEdit() && caseData.status === 'sanksi_diluluskan' && (
+                            {canEdit() && caseData.status === 'approved' && (
                                 <Button className="mt-4" onClick={() => setShowAddForm(true)}>
                                     <Plus className="h-4 w-4 mr-2" />
                                     Tawarkan Kompaun Pertama

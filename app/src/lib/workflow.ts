@@ -1,38 +1,29 @@
 // ============================================
 // PERKESO Prosecution System
 // Workflow Management - Status Transitions & Role-Based Actions
+// SYNCHRONIZED WITH DATABASE SCHEMA
 // ============================================
 
-import type { UserRole } from "@/types";
+import type { UserRole, CaseStatus } from "@/types";
+
+// Re-export CaseStatus from types for convenience
+export type { CaseStatus } from "@/types";
 
 // ============================================
-// STATUS TYPES (Based on 4-database-schema.md)
-// ============================================
-
-export type CaseStatus =
-    | 'draf'
-    | 'dalam_siasatan'
-    | 'menunggu_semakan'
-    | 'menunggu_sanksi'
-    | 'sanksi_diluluskan'
-    | 'dikompaun'
-    | 'didakwa'
-    | 'selesai'
-    | 'nfa';
-
-// ============================================
-// STATUS LABELS (Malay)
+// STATUS LABELS (Malay for UI display)
 // ============================================
 
 export const CASE_STATUS_LABELS: Record<CaseStatus, string> = {
-    draf: 'Draf',
-    dalam_siasatan: 'Dalam Siasatan',
-    menunggu_semakan: 'Menunggu Semakan',
-    menunggu_sanksi: 'Menunggu Sanksi',
-    sanksi_diluluskan: 'Sanksi Diluluskan',
-    dikompaun: 'Dikompaun',
-    didakwa: 'Didakwa',
-    selesai: 'Selesai',
+    draft: 'Draf',
+    in_progress: 'Dalam Siasatan',
+    pending_review: 'Menunggu Semakan',
+    approved: 'Diluluskan',
+    filed: 'Difailkan',
+    closed: 'Ditutup',
+    compound_offered: 'Kompaun Ditawarkan',
+    compound_paid: 'Kompaun Dibayar',
+    prosecution: 'Dalam Pendakwaan',
+    completed: 'Selesai',
     nfa: 'NFA (Tiada Tindakan Lanjut)',
 };
 
@@ -41,14 +32,16 @@ export const CASE_STATUS_LABELS: Record<CaseStatus, string> = {
 // ============================================
 
 export const CASE_STATUS_COLORS: Record<CaseStatus, string> = {
-    draf: 'bg-gray-100 text-gray-800',
-    dalam_siasatan: 'bg-blue-100 text-blue-800',
-    menunggu_semakan: 'bg-yellow-100 text-yellow-800',
-    menunggu_sanksi: 'bg-orange-100 text-orange-800',
-    sanksi_diluluskan: 'bg-green-100 text-green-800',
-    dikompaun: 'bg-purple-100 text-purple-800',
-    didakwa: 'bg-red-100 text-red-800',
-    selesai: 'bg-emerald-100 text-emerald-800',
+    draft: 'bg-gray-100 text-gray-800',
+    in_progress: 'bg-blue-100 text-blue-800',
+    pending_review: 'bg-yellow-100 text-yellow-800',
+    approved: 'bg-green-100 text-green-800',
+    filed: 'bg-indigo-100 text-indigo-800',
+    closed: 'bg-slate-100 text-slate-800',
+    compound_offered: 'bg-orange-100 text-orange-800',
+    compound_paid: 'bg-purple-100 text-purple-800',
+    prosecution: 'bg-red-100 text-red-800',
+    completed: 'bg-emerald-100 text-emerald-800',
     nfa: 'bg-slate-100 text-slate-800',
 };
 
@@ -57,15 +50,17 @@ export const CASE_STATUS_COLORS: Record<CaseStatus, string> = {
 // ============================================
 
 export const STATUS_TRANSITIONS: Record<CaseStatus, CaseStatus[]> = {
-    draf: ['dalam_siasatan'],
-    dalam_siasatan: ['menunggu_semakan', 'draf'], // Can go back to draft if need revision
-    menunggu_semakan: ['menunggu_sanksi', 'dalam_siasatan'], // PO can approve or reject
-    menunggu_sanksi: ['sanksi_diluluskan', 'menunggu_semakan'], // UIP can approve or send back
-    sanksi_diluluskan: ['dikompaun', 'didakwa', 'nfa'],
-    dikompaun: ['selesai', 'didakwa'], // If compound not paid, proceed to prosecution
-    didakwa: ['selesai'],
-    selesai: [], // Terminal state
-    nfa: [], // Terminal state
+    draft: ['in_progress'],
+    in_progress: ['pending_review', 'draft'],
+    pending_review: ['approved', 'in_progress'],
+    approved: ['compound_offered', 'prosecution', 'nfa'],
+    filed: ['prosecution'],
+    closed: [],
+    compound_offered: ['compound_paid', 'prosecution'],
+    compound_paid: ['completed'],
+    prosecution: ['completed'],
+    completed: [],
+    nfa: [],
 };
 
 // ============================================
@@ -81,75 +76,59 @@ export interface WorkflowAction {
 }
 
 export const WORKFLOW_ACTIONS: Record<CaseStatus, WorkflowAction[]> = {
-    draf: [
+    draft: [
         {
             action: 'start_investigation',
             label: 'Mula Siasatan',
-            targetStatus: 'dalam_siasatan',
+            targetStatus: 'in_progress',
             allowedRoles: ['io', 'admin'],
             description: 'Mula proses siasatan untuk kes ini',
         },
     ],
-    dalam_siasatan: [
+    in_progress: [
         {
             action: 'submit_for_review',
             label: 'Hantar untuk Semakan',
-            targetStatus: 'menunggu_semakan',
+            targetStatus: 'pending_review',
             allowedRoles: ['io', 'admin'],
             description: 'Hantar kes kepada PO untuk semakan',
         },
         {
             action: 'back_to_draft',
             label: 'Kembali ke Draf',
-            targetStatus: 'draf',
+            targetStatus: 'draft',
             allowedRoles: ['io', 'admin'],
             description: 'Kembalikan kes ke status draf untuk kemaskini',
         },
     ],
-    menunggu_semakan: [
+    pending_review: [
         {
             action: 'approve_review',
             label: 'Luluskan Semakan',
-            targetStatus: 'menunggu_sanksi',
-            allowedRoles: ['po', 'admin'],
-            description: 'Luluskan semakan dan hantar kepada UIP untuk sanksi',
+            targetStatus: 'approved',
+            allowedRoles: ['po', 'uip', 'admin'],
+            description: 'Luluskan semakan kes',
         },
         {
             action: 'reject_review',
             label: 'Tolak & Kembalikan',
-            targetStatus: 'dalam_siasatan',
+            targetStatus: 'in_progress',
             allowedRoles: ['po', 'admin'],
             description: 'Tolak semakan dan kembalikan kepada IO untuk perbaiki',
         },
     ],
-    menunggu_sanksi: [
-        {
-            action: 'approve_sanction',
-            label: 'Luluskan Sanksi',
-            targetStatus: 'sanksi_diluluskan',
-            allowedRoles: ['uip', 'admin'],
-            description: 'Luluskan sanksi - kes sedia untuk kompaun atau pendakwaan',
-        },
-        {
-            action: 'reject_sanction',
-            label: 'Kembalikan untuk Semakan',
-            targetStatus: 'menunggu_semakan',
-            allowedRoles: ['uip', 'admin'],
-            description: 'Kembalikan kepada PO untuk semakan semula',
-        },
-    ],
-    sanksi_diluluskan: [
+    approved: [
         {
             action: 'offer_compound',
             label: 'Tawarkan Kompaun',
-            targetStatus: 'dikompaun',
+            targetStatus: 'compound_offered',
             allowedRoles: ['uip', 'po', 'admin'],
             description: 'Tawarkan kompaun kepada OKS',
         },
         {
             action: 'proceed_prosecution',
             label: 'Teruskan Pendakwaan',
-            targetStatus: 'didakwa',
+            targetStatus: 'prosecution',
             allowedRoles: ['uip', 'po', 'admin'],
             description: 'Teruskan dengan pendakwaan di mahkamah',
         },
@@ -161,32 +140,51 @@ export const WORKFLOW_ACTIONS: Record<CaseStatus, WorkflowAction[]> = {
             description: 'Tutup kes dengan status NFA (Tiada Tindakan Lanjut)',
         },
     ],
-    dikompaun: [
+    filed: [
+        {
+            action: 'proceed_prosecution',
+            label: 'Teruskan Pendakwaan',
+            targetStatus: 'prosecution',
+            allowedRoles: ['po', 'admin'],
+            description: 'Teruskan dengan pendakwaan di mahkamah',
+        },
+    ],
+    closed: [],
+    compound_offered: [
         {
             action: 'compound_paid',
             label: 'Kompaun Dibayar',
-            targetStatus: 'selesai',
+            targetStatus: 'compound_paid',
             allowedRoles: ['io', 'po', 'admin'],
-            description: 'Tandakan kompaun telah dibayar - kes selesai',
+            description: 'Tandakan kompaun telah dibayar',
         },
         {
             action: 'compound_unpaid',
             label: 'Kompaun Tidak Dibayar',
-            targetStatus: 'didakwa',
+            targetStatus: 'prosecution',
             allowedRoles: ['io', 'po', 'admin'],
             description: 'Kompaun tidak dibayar - teruskan pendakwaan',
         },
     ],
-    didakwa: [
+    compound_paid: [
         {
             action: 'case_completed',
             label: 'Kes Selesai',
-            targetStatus: 'selesai',
+            targetStatus: 'completed',
+            allowedRoles: ['io', 'po', 'admin'],
+            description: 'Tandakan kes telah selesai',
+        },
+    ],
+    prosecution: [
+        {
+            action: 'case_completed',
+            label: 'Kes Selesai',
+            targetStatus: 'completed',
             allowedRoles: ['po', 'uip', 'admin'],
             description: 'Tandakan kes telah selesai selepas keputusan mahkamah',
         },
     ],
-    selesai: [],
+    completed: [],
     nfa: [],
 };
 
@@ -194,9 +192,6 @@ export const WORKFLOW_ACTIONS: Record<CaseStatus, WorkflowAction[]> = {
 // HELPER FUNCTIONS
 // ============================================
 
-/**
- * Get available actions for a case status and user role
- */
 export function getAvailableActions(
     currentStatus: CaseStatus,
     userRole: UserRole
@@ -205,9 +200,6 @@ export function getAvailableActions(
     return actions.filter((action) => action.allowedRoles.includes(userRole));
 }
 
-/**
- * Check if a status transition is valid
- */
 export function isValidTransition(
     fromStatus: CaseStatus,
     toStatus: CaseStatus
@@ -216,21 +208,14 @@ export function isValidTransition(
     return allowedTransitions.includes(toStatus);
 }
 
-/**
- * Check if user can perform action
- */
 export function canPerformAction(
     currentStatus: CaseStatus,
     targetStatus: CaseStatus,
     userRole: UserRole
 ): boolean {
-    // Admin can always perform actions
     if (userRole === 'admin') return true;
-
-    // Check if transition is valid
     if (!isValidTransition(currentStatus, targetStatus)) return false;
 
-    // Check if user role is allowed
     const actions = WORKFLOW_ACTIONS[currentStatus] || [];
     const action = actions.find((a) => a.targetStatus === targetStatus);
     if (!action) return false;
@@ -238,26 +223,22 @@ export function canPerformAction(
     return action.allowedRoles.includes(userRole);
 }
 
-/**
- * Get next possible statuses for a given status
- */
 export function getNextStatuses(currentStatus: CaseStatus): CaseStatus[] {
     return STATUS_TRANSITIONS[currentStatus] || [];
 }
 
-/**
- * Get workflow description for status
- */
 export function getStatusDescription(status: CaseStatus): string {
     const descriptions: Record<CaseStatus, string> = {
-        draf: 'Kes dalam draf - IO boleh edit dan tambah maklumat',
-        dalam_siasatan: 'Kes sedang disiasat - IO sedang mengumpul bukti dan rakaman',
-        menunggu_semakan: 'Kes menunggu semakan oleh PO',
-        menunggu_sanksi: 'Kes menunggu sanksi oleh UIP',
-        sanksi_diluluskan: 'Sanksi diluluskan - sedia untuk kompaun atau pendakwaan',
-        dikompaun: 'Kompaun telah ditawarkan - menunggu bayaran',
-        didakwa: 'Kes telah didakwa di mahkamah',
-        selesai: 'Kes telah selesai',
+        draft: 'Kes dalam draf - IO boleh edit dan tambah maklumat',
+        in_progress: 'Kes sedang disiasat - IO sedang mengumpul bukti',
+        pending_review: 'Kes menunggu semakan oleh PO/UIP',
+        approved: 'Kes diluluskan - sedia untuk kompaun atau pendakwaan',
+        filed: 'Kes telah difailkan',
+        closed: 'Kes telah ditutup',
+        compound_offered: 'Kompaun telah ditawarkan - menunggu bayaran',
+        compound_paid: 'Kompaun telah dibayar',
+        prosecution: 'Kes dalam pendakwaan di mahkamah',
+        completed: 'Kes telah selesai',
         nfa: 'Kes ditutup - Tiada Tindakan Lanjut',
     };
     return descriptions[status] || '';
@@ -279,33 +260,18 @@ export interface WorkflowHistory {
     created_at: string;
 }
 
-// ============================================
-// NOTIFICATION TYPES
-// ============================================
-
-export interface WorkflowNotification {
-    case_id: string;
-    case_number: string;
-    status: CaseStatus;
-    action: string;
-    message: string;
-    notify_roles: UserRole[];
-    created_at: string;
-}
-
-/**
- * Get roles that should be notified for a status change
- */
 export function getNotifyRoles(targetStatus: CaseStatus): UserRole[] {
     const roleMap: Record<CaseStatus, UserRole[]> = {
-        draf: ['io'],
-        dalam_siasatan: ['io'],
-        menunggu_semakan: ['po'],
-        menunggu_sanksi: ['uip'],
-        sanksi_diluluskan: ['io', 'po', 'uip'],
-        dikompaun: ['io', 'po'],
-        didakwa: ['po', 'uip'],
-        selesai: ['io', 'po', 'uip'],
+        draft: ['io'],
+        in_progress: ['io'],
+        pending_review: ['po', 'uip'],
+        approved: ['io', 'po', 'uip'],
+        filed: ['po'],
+        closed: ['io', 'po'],
+        compound_offered: ['io', 'po'],
+        compound_paid: ['io', 'po'],
+        prosecution: ['po', 'uip'],
+        completed: ['io', 'po', 'uip'],
         nfa: ['io', 'po'],
     };
     return roleMap[targetStatus] || [];

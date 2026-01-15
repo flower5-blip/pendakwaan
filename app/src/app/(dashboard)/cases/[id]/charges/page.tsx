@@ -122,7 +122,7 @@ export default function ChargesPage() {
             // Gunakan Server Action dengan validasi workflow
             const result = await updateCaseStatus(
                 caseId,
-                'didakwa',
+                'prosecution',
                 `Difailkan di ${filingData.court_name}. ${filingData.notes || ''}`
             );
 
@@ -163,9 +163,9 @@ export default function ChargesPage() {
 
     // Check if case is ready for prosecution
     const canProsecute =
-        caseData.status === 'sanksi_diluluskan' ||
-        caseData.status === 'dikompaun' ||
-        caseData.status === 'didakwa';
+        caseData.status === 'approved' ||
+        caseData.status === 'compound_offered' ||
+        caseData.status === 'prosecution';
 
     return (
         <div className="max-w-6xl mx-auto space-y-6">

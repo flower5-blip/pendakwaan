@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { CASE_STATUS_LABELS, ACT_TYPE_LABELS, USER_ROLE_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import type { Case, Person } from "@/types";
+import type { Case, Employee } from "@/types";
 import StatusChange from "@/components/workflow/StatusChange";
 import Timeline from "@/components/workflow/Timeline";
 import {
@@ -43,7 +43,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
     const supabase = createClient();
 
     const [caseData, setCaseData] = useState<Case | null>(null);
-    const [persons, setPersons] = useState<Person[]>([]);
+    const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -66,13 +66,13 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
 
             setCaseData(data);
 
-            // Fetch persons
-            const { data: personsData } = await supabase
-                .from("persons")
+            // Fetch employees
+            const { data: employeesData } = await supabase
+                .from("employees")
                 .select("*")
                 .eq("case_id", id);
 
-            setPersons(personsData || []);
+            setEmployees(employeesData || []);
             setLoading(false);
         };
 
@@ -132,9 +132,9 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                             </h1>
                             <Badge
                                 variant={
-                                    caseData.status === "sanksi_diluluskan" || caseData.status === "selesai"
+                                    caseData.status === "approved" || caseData.status === "completed"
                                         ? "success"
-                                        : caseData.status === "menunggu_semakan" || caseData.status === "menunggu_sanksi"
+                                        : caseData.status === "pending_review"
                                             ? "warning"
                                             : "secondary"
                                 }
@@ -231,12 +231,12 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <p className="text-sm text-gray-500">Nama Majikan</p>
-                                        <p className="font-medium">{caseData.employer.name}</p>
+                                        <p className="font-medium">{caseData.employer.company_name}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500">No. SSM</p>
                                         <p className="font-medium">
-                                            {caseData.employer.ssm_no || "-"}
+                                            {caseData.employer.ssm_number || "-"}
                                         </p>
                                     </div>
                                     <div>
@@ -283,7 +283,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                         Dokumen
                                     </Button>
                                 </Link>
-                                {caseData.status === 'menunggu_semakan' && (
+                                {caseData.status === 'pending_review' && (
                                     <Link href={`/cases/${id}/review`}>
                                         <Button variant="outline" size="sm" className="w-full justify-start">
                                             <FileText className="h-4 w-4 mr-2" />
@@ -291,7 +291,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                         </Button>
                                     </Link>
                                 )}
-                                {caseData.status === 'menunggu_sanksi' && (
+                                {caseData.status === 'approved' && (
                                     <Link href={`/cases/${id}/sanction`}>
                                         <Button variant="outline" size="sm" className="w-full justify-start">
                                             <Scale className="h-4 w-4 mr-2" />
@@ -299,7 +299,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                         </Button>
                                     </Link>
                                 )}
-                                {(caseData.status === 'sanksi_diluluskan' || caseData.status === 'dikompaun') && (
+                                {(caseData.status === 'approved' || caseData.status === 'compound_offered') && (
                                     <Link href={`/cases/${id}/compound`}>
                                         <Button variant="outline" size="sm" className="w-full justify-start">
                                             <DollarSign className="h-4 w-4 mr-2" />
@@ -307,7 +307,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                         </Button>
                                     </Link>
                                 )}
-                                {(caseData.status === 'sanksi_diluluskan' || caseData.status === 'dikompaun' || caseData.status === 'didakwa') && (
+                                {(caseData.status === 'approved' || caseData.status === 'compound_offered' || caseData.status === 'prosecution') && (
                                     <Link href={`/cases/${id}/charges`}>
                                         <Button variant="outline" size="sm" className="w-full justify-start">
                                             <Gavel className="h-4 w-4 mr-2" />
@@ -324,7 +324,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                         <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle className="flex items-center gap-2">
                                 <Users className="h-5 w-5" />
-                                Saksi / OKS / Pekerja
+                                Saksi / OKS / Pekerja Terlibat
                             </CardTitle>
                             {canEdit() && (
                                 <Button variant="outline" size="sm">
@@ -334,15 +334,15 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                             )}
                         </CardHeader>
                         <CardContent>
-                            {persons.length === 0 ? (
+                            {employees.length === 0 ? (
                                 <p className="text-gray-500 text-center py-4">
-                                    Tiada rekod saksi/OKS/pekerja
+                                    Tiada rekod pekerja terlibat
                                 </p>
                             ) : (
                                 <div className="space-y-3">
-                                    {persons.map((person) => (
+                                    {employees.map((employee) => (
                                         <div
-                                            key={person.id}
+                                            key={employee.id}
                                             className="flex items-center justify-between p-3 rounded-lg border border-gray-200"
                                         >
                                             <div className="flex items-center gap-3">
@@ -350,13 +350,15 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                                     <User className="h-5 w-5 text-gray-600" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium">{person.name}</p>
+                                                    <p className="font-medium">{employee.full_name}</p>
                                                     <p className="text-sm text-gray-500">
-                                                        {person.ic_number} • {person.role}
+                                                        {employee.ic_number} • {employee.position || 'N/A'}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Badge variant="outline">{person.role}</Badge>
+                                            <Badge variant="outline">
+                                                {employee.is_registered ? 'Berdaftar' : 'Tidak Berdaftar'}
+                                            </Badge>
                                         </div>
                                     ))}
                                 </div>
@@ -377,7 +379,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                 <span className="text-sm text-gray-500">Status Semasa</span>
                                 <Badge
                                     variant={
-                                        caseData.status === "sanksi_diluluskan" || caseData.status === "selesai" ? "success" : "secondary"
+                                        caseData.status === "approved" || caseData.status === "completed" ? "success" : "secondary"
                                     }
                                 >
                                     {CASE_STATUS_LABELS[caseData.status]}

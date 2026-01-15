@@ -64,7 +64,7 @@ export default function ReviewPage() {
         if (!caseData) return;
 
         setSubmitting(true);
-        const result = await updateCaseStatus(caseId, 'menunggu_sanksi', reviewNotes);
+        const result = await updateCaseStatus(caseId, 'approved', reviewNotes);
 
         if (result.success) {
             alert('Kes diluluskan dan dihantar kepada UIP untuk sanksi.');
@@ -79,7 +79,7 @@ export default function ReviewPage() {
         if (!caseData) return;
 
         setSubmitting(true);
-        const result = await updateCaseStatus(caseId, 'dalam_siasatan', reviewNotes);
+        const result = await updateCaseStatus(caseId, 'in_progress', reviewNotes);
 
         if (result.success) {
             alert('Kes ditolak dan dikembalikan kepada IO untuk perbaiki.');
@@ -111,7 +111,7 @@ export default function ReviewPage() {
 
     const currentStatus = caseData.status as CaseStatus;
 
-    if (currentStatus !== 'menunggu_semakan') {
+    if (currentStatus !== 'pending_review') {
         return (
             <div className="text-center py-12">
                 <p className="text-gray-600">
@@ -158,7 +158,7 @@ export default function ReviewPage() {
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Majikan</p>
-                            <p className="font-medium">{caseData.employer?.name || '-'}</p>
+                            <p className="font-medium">{caseData.employer?.company_name || '-'}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Pegawai Penyiasat</p>

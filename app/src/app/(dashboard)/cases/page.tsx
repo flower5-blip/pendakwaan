@@ -30,7 +30,7 @@ export default function CasesPage() {
     const filteredCases = cases.filter((caseItem) => {
         const matchesSearch =
             caseItem.case_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            caseItem.employer?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+            caseItem.employer?.company_name?.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesStatus =
             statusFilter === "all" || caseItem.status === statusFilter;
@@ -92,14 +92,13 @@ export default function CasesPage() {
                                 className="h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="all">Semua Status</option>
-                                <option value="draf">Draf</option>
-                                <option value="dalam_siasatan">Dalam Siasatan</option>
-                                <option value="menunggu_semakan">Menunggu Semakan</option>
-                                <option value="menunggu_sanksi">Menunggu Sanksi</option>
-                                <option value="sanksi_diluluskan">Sanksi Diluluskan</option>
-                                <option value="dikompaun">Dikompaun</option>
-                                <option value="didakwa">Didakwa</option>
-                                <option value="selesai">Selesai</option>
+                                <option value="draft">Draf</option>
+                                <option value="in_progress">Dalam Siasatan</option>
+                                <option value="pending_review">Menunggu Semakan</option>
+                                <option value="approved">Diluluskan</option>
+                                <option value="compound_offered">Kompaun Ditawarkan</option>
+                                <option value="prosecution">Dalam Pendakwaan</option>
+                                <option value="completed">Selesai</option>
                                 <option value="nfa">NFA</option>
                             </select>
                         </div>
@@ -155,11 +154,11 @@ export default function CasesPage() {
                                                 </Link>
                                                 <Badge
                                                     variant={
-                                                        caseItem.status === "sanksi_diluluskan" || caseItem.status === "selesai"
+                                                        caseItem.status === "approved" || caseItem.status === "completed"
                                                             ? "success"
-                                                            : caseItem.status === "menunggu_semakan" || caseItem.status === "menunggu_sanksi"
+                                                            : caseItem.status === "pending_review"
                                                                 ? "warning"
-                                                                : caseItem.status === "draf"
+                                                                : caseItem.status === "draft"
                                                                     ? "secondary"
                                                                     : "default"
                                                     }
@@ -168,7 +167,7 @@ export default function CasesPage() {
                                                 </Badge>
                                             </div>
                                             <p className="text-sm text-gray-600">
-                                                {caseItem.employer?.name || "Majikan tidak ditetapkan"}
+                                                {caseItem.employer?.company_name || "Majikan tidak ditetapkan"}
                                             </p>
                                             <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
                                                 <span>{ACT_TYPE_LABELS[caseItem.act_type]}</span>

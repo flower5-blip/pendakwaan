@@ -169,7 +169,7 @@ export async function updateCaseStatus(
 
 export async function approveSanctionWithRoute(
     caseId: string,
-    route: 'dikompaun' | 'didakwa' | 'nfa',
+    route: 'compound_offered' | 'prosecution' | 'nfa',
     notes?: string
 ): Promise<WorkflowActionResult> {
     try {
@@ -220,16 +220,16 @@ export async function approveSanctionWithRoute(
         }
 
         // Validate current status must be menunggu_sanksi
-        if (currentCase.status !== 'menunggu_sanksi') {
+        if (currentCase.status !== 'approved') {
             return {
                 success: false,
                 message: 'Status tidak sah',
-                error: `Kes mesti dalam status "Menunggu Sanksi". Status semasa: ${currentCase.status}`,
+                error: `Kes mesti dalam status "Diluluskan". Status semasa: ${currentCase.status}`,
             };
         }
 
-        // Validate route is allowed from sanksi_diluluskan
-        const allowedRoutes = ['dikompaun', 'didakwa', 'nfa'];
+        // Validate route is allowed from approved
+        const allowedRoutes = ['compound_offered', 'prosecution', 'nfa'];
         if (!allowedRoutes.includes(route)) {
             return {
                 success: false,
@@ -256,12 +256,12 @@ export async function approveSanctionWithRoute(
         }
 
         // Log audit trail
-        const routeLabel = route === 'dikompaun' ? 'Kompaun' : route === 'didakwa' ? 'Pendakwaan' : 'NFA';
+        const routeLabel = route === 'compound_offered' ? 'Kompaun' : route === 'prosecution' ? 'Pendakwaan' : 'NFA';
         await supabase.from('audit_trail').insert({
             table_name: 'cases',
             record_id: caseId,
             action: 'update',
-            old_data: { status: 'menunggu_sanksi' },
+            old_data: { status: 'approved' },
             new_data: { status: route, sanction_approved: true, route: routeLabel },
             user_id: user.id,
         });

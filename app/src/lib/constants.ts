@@ -1,5 +1,14 @@
+// ============================================
+// PERKESO Prosecution System Constants
+// Synchronized with database schema
+// ============================================
+
 export const APP_NAME = "PERKESO Prosecution Paper Builder";
 export const APP_SHORT_NAME = "PPB";
+
+// ============================================
+// USER ROLES
+// ============================================
 
 export const USER_ROLES = {
     ADMIN: "admin",
@@ -17,63 +26,131 @@ export const USER_ROLE_LABELS: Record<string, string> = {
     viewer: "Pemerhati",
 };
 
-// Updated to match workflow from 4-database-schema.md
+// ============================================
+// CASE STATUS - Uses English keys to match database enum
+// ============================================
+
 export const CASE_STATUS = {
-    DRAF: "draf",
-    DALAM_SIASATAN: "dalam_siasatan",
-    MENUNGGU_SEMAKAN: "menunggu_semakan",
-    MENUNGGU_SANKSI: "menunggu_sanksi",
-    SANKSI_DILULUSKAN: "sanksi_diluluskan",
-    DIKOMPAUN: "dikompaun",
-    DIDAKWA: "didakwa",
-    SELESAI: "selesai",
+    DRAFT: "draft",
+    IN_PROGRESS: "in_progress",
+    PENDING_REVIEW: "pending_review",
+    APPROVED: "approved",
+    FILED: "filed",
+    CLOSED: "closed",
+    COMPOUND_OFFERED: "compound_offered",
+    COMPOUND_PAID: "compound_paid",
+    PROSECUTION: "prosecution",
+    COMPLETED: "completed",
     NFA: "nfa",
 } as const;
 
+// Labels use Malay for UI display
 export const CASE_STATUS_LABELS: Record<string, string> = {
-    draf: "Draf",
-    dalam_siasatan: "Dalam Siasatan",
-    menunggu_semakan: "Menunggu Semakan",
-    menunggu_sanksi: "Menunggu Sanksi",
-    sanksi_diluluskan: "Sanksi Diluluskan",
-    dikompaun: "Dikompaun",
-    didakwa: "Didakwa",
-    selesai: "Selesai",
+    draft: "Draf",
+    in_progress: "Dalam Siasatan",
+    pending_review: "Menunggu Semakan",
+    approved: "Diluluskan",
+    filed: "Difailkan",
+    closed: "Ditutup",
+    compound_offered: "Kompaun Ditawarkan",
+    compound_paid: "Kompaun Dibayar",
+    prosecution: "Dalam Pendakwaan",
+    completed: "Selesai",
     nfa: "NFA (Tiada Tindakan Lanjut)",
 };
 
 export const CASE_STATUS_COLORS: Record<string, string> = {
-    draf: "bg-gray-100 text-gray-800",
-    dalam_siasatan: "bg-blue-100 text-blue-800",
-    menunggu_semakan: "bg-yellow-100 text-yellow-800",
-    menunggu_sanksi: "bg-orange-100 text-orange-800",
-    sanksi_diluluskan: "bg-green-100 text-green-800",
-    dikompaun: "bg-purple-100 text-purple-800",
-    didakwa: "bg-red-100 text-red-800",
-    selesai: "bg-emerald-100 text-emerald-800",
+    draft: "bg-gray-100 text-gray-800",
+    in_progress: "bg-blue-100 text-blue-800",
+    pending_review: "bg-yellow-100 text-yellow-800",
+    approved: "bg-green-100 text-green-800",
+    filed: "bg-indigo-100 text-indigo-800",
+    closed: "bg-slate-100 text-slate-800",
+    compound_offered: "bg-orange-100 text-orange-800",
+    compound_paid: "bg-purple-100 text-purple-800",
+    prosecution: "bg-red-100 text-red-800",
+    completed: "bg-emerald-100 text-emerald-800",
     nfa: "bg-slate-100 text-slate-800",
 };
 
+// ============================================
+// ACT TYPES - Using underscore format to match database
+// ============================================
+
 export const ACT_TYPES = {
-    AKTA_4: "akta4",
-    AKTA_800: "akta800",
-    BOTH: "both",
+    AKTA_4: "akta_4",
+    AKTA_800: "akta_800",
 } as const;
 
 export const ACT_TYPE_LABELS: Record<string, string> = {
-    akta4: "Akta 4 (KWSP)",
-    akta800: "Akta 800 (SIP)",
-    both: "Kedua-dua Akta",
+    akta_4: "Akta 4 (KWSP)",
+    akta_800: "Akta 800 (SIP)",
 };
 
+// ============================================
+// EVIDENCE STATUS
+// ============================================
+
 export const EVIDENCE_STATUS = {
-    DRAFT: "draft",
-    READY: "ready",
-    NEED_FIX: "need_fix",
+    COLLECTED: "collected",
+    VERIFIED: "verified",
+    SUBMITTED: "submitted",
+    RETURNED: "returned",
 } as const;
 
 export const EVIDENCE_STATUS_LABELS: Record<string, string> = {
-    draft: "Draf",
-    ready: "Sedia",
-    need_fix: "Perlu Diperbaiki",
+    collected: "Dikumpulkan",
+    verified: "Disahkan",
+    submitted: "Dikemukakan",
+    returned: "Dikembalikan",
+};
+
+// ============================================
+// PERSON ROLES
+// ============================================
+
+export const PERSON_ROLES = {
+    SAKSI: "saksi",
+    OKS: "oks",
+    OKS_REPRESENTATIVE: "oks_representative",
+} as const;
+
+export const PERSON_ROLE_LABELS: Record<string, string> = {
+    saksi: "Saksi",
+    oks: "OKS",
+    oks_representative: "Wakil OKS",
+};
+
+// ============================================
+// COMPOUND STATUS
+// ============================================
+
+export const COMPOUND_STATUS = {
+    PENDING: "pending",
+    PAID: "paid",
+    EXPIRED: "expired",
+    CANCELLED: "cancelled",
+} as const;
+
+export const COMPOUND_STATUS_LABELS: Record<string, string> = {
+    pending: "Menunggu",
+    paid: "Dibayar",
+    expired: "Tamat Tempoh",
+    cancelled: "Dibatalkan",
+};
+
+// ============================================
+// RECOMMENDATION
+// ============================================
+
+export const RECOMMENDATION = {
+    COMPOUND: "compound",
+    PROSECUTE: "prosecute",
+    NFA: "nfa",
+} as const;
+
+export const RECOMMENDATION_LABELS: Record<string, string> = {
+    compound: "Kompaun",
+    prosecute: "Dakwa",
+    nfa: "NFA",
 };

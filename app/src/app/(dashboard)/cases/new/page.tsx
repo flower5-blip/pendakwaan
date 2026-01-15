@@ -59,7 +59,7 @@ export default function NewCasePage() {
             const { data } = await supabase
                 .from("employers")
                 .select("*")
-                .order("name");
+                .order("company_name");
             if (data) setEmployers(data);
         };
         fetchEmployers();
@@ -77,8 +77,8 @@ export default function NewCasePage() {
                 const { data: newEmployer, error: employerError } = await supabase
                     .from("employers")
                     .insert({
-                        name: formData.employer_name,
-                        ssm_no: formData.employer_ssm,
+                        company_name: formData.employer_name,
+                        ssm_number: formData.employer_ssm,
                         address: formData.employer_address,
                         phone: formData.employer_phone,
                         email: formData.employer_email,
@@ -109,7 +109,7 @@ export default function NewCasePage() {
                     case_number: formData.case_number,
                     employer_id: employerId || null,
                     io_id: profile?.id,
-                    status: "draf",
+                    status: "draft",
                     act_type: formData.act_type,
                     // Prosecution fields - CRITICAL FIX: Save all collected data
                     offense_type: formData.offense_type,
@@ -414,7 +414,7 @@ export default function NewCasePage() {
                                     }
                                     options={employers.map((e) => ({
                                         value: e.id,
-                                        label: `${e.name} (${e.ssm_no || "Tiada SSM"})`,
+                                        label: `${e.company_name} (${e.ssm_number || "Tiada SSM"})`,
                                     }))}
                                     placeholder="-- Pilih majikan --"
                                 />
@@ -458,7 +458,7 @@ export default function NewCasePage() {
                                         {createNewEmployer
                                             ? formData.employer_name || "Belum diisi"
                                             : employers.find((e) => e.id === formData.employer_id)
-                                                ?.name || "Belum dipilih"}
+                                                ?.company_name || "Belum dipilih"}
                                     </p>
                                 </div>
                                 <div>

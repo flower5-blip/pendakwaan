@@ -23,11 +23,11 @@ export default function DashboardPage() {
 
     const stats = {
         total: cases.length,
-        draft: cases.filter((c) => c.status === "draf").length,
-        dalamSiasatan: cases.filter((c) => c.status === "dalam_siasatan").length,
-        pendingReview: cases.filter((c) => c.status === "menunggu_semakan").length,
-        pendingSanction: cases.filter((c) => c.status === "menunggu_sanksi").length,
-        selesai: cases.filter((c) => c.status === "selesai").length,
+        draft: cases.filter((c) => c.status === "draft").length,
+        inProgress: cases.filter((c) => c.status === "in_progress").length,
+        pendingReview: cases.filter((c) => c.status === "pending_review").length,
+        approved: cases.filter((c) => c.status === "approved").length,
+        completed: cases.filter((c) => c.status === "completed").length,
     };
 
     const recentCases = cases.slice(0, 5);
@@ -100,7 +100,7 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600">Dalam Siasatan</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.dalamSiasatan}</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600">Selesai</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.selesai}</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -177,15 +177,15 @@ export default function DashboardPage() {
                                                 {caseItem.case_number}
                                             </p>
                                             <p className="text-sm text-gray-500">
-                                                {caseItem.employer?.name || "Majikan tidak ditetapkan"}
+                                                {caseItem.employer?.company_name || "Majikan tidak ditetapkan"}
                                             </p>
                                         </div>
                                     </div>
                                     <Badge
                                         variant={
-                                            caseItem.status === "sanksi_diluluskan" || caseItem.status === "selesai"
+                                            caseItem.status === "approved" || caseItem.status === "completed"
                                                 ? "success"
-                                                : caseItem.status === "menunggu_semakan" || caseItem.status === "menunggu_sanksi"
+                                                : caseItem.status === "pending_review"
                                                     ? "warning"
                                                     : "secondary"
                                         }
