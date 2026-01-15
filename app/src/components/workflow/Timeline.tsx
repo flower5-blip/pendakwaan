@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 import { getWorkflowHistory } from '@/app/actions/workflow-actions';
 import { CASE_STATUS_LABELS, CASE_STATUS_COLORS, type CaseStatus } from '@/lib/workflow';
 import { formatDate } from '@/lib/utils';
-import { Clock } from 'lucide-react';
 import { Clock, User } from 'lucide-react';
 
 // ============================================
@@ -87,11 +86,10 @@ export default function Timeline({ caseId }: TimelineProps) {
                         <div key={item.id} className="relative flex items-start gap-4">
                             {/* Timeline Dot */}
                             <div
-                                className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full ${
-                                    index === 0
+                                className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full ${index === 0
                                         ? 'bg-blue-600'
                                         : 'bg-gray-300'
-                                }`}
+                                    }`}
                             >
                                 <div className="h-2 w-2 rounded-full bg-white"></div>
                             </div>
@@ -100,10 +98,9 @@ export default function Timeline({ caseId }: TimelineProps) {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span
-                                        className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-                                            CASE_STATUS_COLORS[item.to_status] ||
+                                        className={`inline-flex px-2 py-1 rounded text-xs font-medium ${CASE_STATUS_COLORS[item.to_status] ||
                                             'bg-gray-100 text-gray-800'
-                                        }`}
+                                            }`}
                                     >
                                         {CASE_STATUS_LABELS[item.to_status]}
                                     </span>
