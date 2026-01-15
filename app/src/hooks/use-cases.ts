@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Case } from "@/types";
 
@@ -8,7 +8,8 @@ export function useCases() {
     const [cases, setCases] = useState<Case[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const supabase = createClient();
+    // Memoize supabase client to prevent infinite loops in dependency arrays
+    const supabase = useMemo(() => createClient(), []);
 
     const fetchCases = useCallback(async () => {
         setLoading(true);
@@ -81,7 +82,6 @@ export function useCases() {
             .select(`
         *,
         employer:employers(*),
-        io:profiles!cases_io_id_fkey(*),
         persons(*)
       `)
             .eq("id", id)
