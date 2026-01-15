@@ -377,7 +377,7 @@ export default function CaseDetailPage({ params }: CaseDetailPageProps) {
                                 <span className="text-sm text-gray-500">Status Semasa</span>
                                 <Badge
                                     variant={
-                                        caseData.status === "approved" ? "success" : "secondary"
+                                        caseData.status === "sanksi_diluluskan" || caseData.status === "selesai" ? "success" : "secondary"
                                     }
                                 >
                                     {CASE_STATUS_LABELS[caseData.status]}
